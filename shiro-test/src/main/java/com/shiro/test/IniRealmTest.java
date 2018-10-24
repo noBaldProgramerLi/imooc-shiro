@@ -28,7 +28,6 @@ public class IniRealmTest {
         System.out.println("isAuthenticated:" + subject.isAuthenticated());
 
         subject.checkRole("admin");
-
         subject.checkPermission("user:delet");
     }
 }
