@@ -6,6 +6,7 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.crypto.hash.Md5Hash;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 
@@ -63,5 +64,11 @@ public class CustomRealm extends AuthorizingRealm {
 
     private String getPasswordByUserName(String username) {
        return  users.get(username);
+    }
+
+    public static void main(String[] args) {
+        Md5Hash md5Hash = new Md5Hash("123456");
+        System.out.println(md5Hash.toString());
+
     }
 }

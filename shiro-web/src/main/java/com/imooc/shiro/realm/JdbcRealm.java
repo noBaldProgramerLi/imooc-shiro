@@ -1,5 +1,7 @@
 package com.imooc.shiro.realm;
 
+import com.imooc.bean.User;
+import com.imooc.dao.UserDao;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -9,20 +11,16 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import javax.annotation.Resource;
+import java.util.*;
 
 /**
  * 自定义Realm
  */
-public class CustomRealm extends AuthorizingRealm {
-    Map<String,String> users = new HashMap<String, String>();
-    {
-        users.put("Mark","123456");
-        super.setName("CustomRealm");
-    }
+public class JdbcRealm extends AuthorizingRealm {
+
+    @Resource
+    private UserDao userDao;
 
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
         String username = (String) principalCollection.getPrimaryPrincipal();
@@ -43,9 +41,8 @@ public class CustomRealm extends AuthorizingRealm {
     }
 
     private Set<String> getRolesByUserName(String username) {
-        Set<String> roles = new HashSet<String>();
-        roles.add("admin");
-        roles.add("root");
+        List<String> list = userDao.queryRolesByUserName(username);
+        Set<String> roles = new HashSet<String>(list);
         return roles;
     }
 
@@ -57,11 +54,16 @@ public class CustomRealm extends AuthorizingRealm {
         if (password == null){
             return null;
         }
-        SimpleAuthenticationInfo simpleAuthenticationInfo = new SimpleAuthenticationInfo("Mark","e10adc3949ba59abbe56e057f20f883e","CustomRealm");
+        //SimpleAuthenticationInfo simpleAuthenticationInfo = new SimpleAuthenticationInfo(username,password,"CustomRealm");
+        SimpleAuthenticationInfo simpleAuthenticationInfo = new SimpleAuthenticationInfo(username,password,"JdbcRealm");
         return simpleAuthenticationInfo;
     }
 
     private String getPasswordByUserName(String username) {
-       return  users.get(username);
+        User user = userDao.getUserNyUserName(username);
+        if (user != null){
+            return user.getPassword();
+        }
+       return  null;
     }
 }
